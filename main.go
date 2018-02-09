@@ -3,61 +3,33 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"sync"
-	"time"
 )
 
 func main() {
-	maxProducers := 1
-	var maxConsumers = 10
+	maxProducers := 5
+	var maxConsumers = 5
 
-	delivery := make(chan food)
-
-	var wg sync.WaitGroup
-	wg.Add(maxProducers)
-	wg.Add(maxConsumers)
+	delivery := make(chan string)
 
 	for i := 1; i <= maxProducers; i++ {
-		go producer(i, delivery, &wg)
+		go producer(i, delivery)
 	}
 
 	for i := 1; i <= maxConsumers; i++ {
-		go consumer(i, delivery, &wg)
+		go consumer(i, delivery)
 	}
-
-	wg.Wait()
 }
 
-type food interface {
-	eat()
-}
-
-type nutella struct {
-	Size int
-}
-
-func (n nutella) eat() {
-	fmt.Printf("Eating Nutella!!! %v\n", n.Size)
-	time.Sleep(time.Second * time.Duration(n.Size))
-}
-
-func producer(id int, delivery chan<- food, wg *sync.WaitGroup) {
+func producer(id int, delivery chan<- string) {
 	fmt.Printf("Producer created: %v\n", id)
 
-	var n nutella
-	n.Size = rand.Intn(20)
-
-	delivery <- n
-
-	wg.Done()
+	delivery <- fmt.Sprintf("Product %d", rand.Intn(20))
 }
 
-func consumer(id int, delivery <-chan food, wg *sync.WaitGroup) {
+func consumer(id int, delivery <-chan string) {
 	fmt.Printf("Consumer created: %v\n", id)
 
-	n := <-delivery
+	p := <-delivery
 
-	n.eat()
-
-	wg.Done()
+	fmt.Printf("Product consumed: %s", p)
 }
