@@ -44,9 +44,13 @@ func consumer(id int, delivery <-chan nutella, wg *sync.WaitGroup) {
 	fmt.Printf("Consumer created: %v\n", id)
 
 	n := <-delivery
-	fmt.Printf("Consumed: %+v\n", n)
+	n.eat()
 }
 
 type nutella struct {
 	weight int
+}
+
+func (n nutella) eat() {
+	fmt.Printf("Eating %v grams of nutella\n", n.weight)
 }
