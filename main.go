@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sync"
+	"time"
 )
 
 func main() {
@@ -32,20 +33,19 @@ func producer(id int, delivery chan<- food, wg *sync.WaitGroup) {
 
 	fmt.Printf("Producer created: %v\n", id)
 
-	if rand.Intn(3) > 1 {
-		var n nutella
-		n.weight = id
-		fmt.Printf("Produced nutella: %+v\n", n)
+	var f food
 
-		delivery <- n
+	rand.Seed(time.Now().UnixNano())
+
+	if rand.Intn(2) == 1 {
+		f = nutella{weight: id}
+		fmt.Printf("Produced nutella: %+v\n", f)
 	} else {
-		var r root
-		r.weight = id
-		fmt.Printf("Produced root: %+v\n", r)
-
-		delivery <- r
+		f = root{weight: id}
+		fmt.Printf("Produced root: %+v\n", f)
 	}
 
+	delivery <- f
 }
 
 func consumer(id int, delivery <-chan food, wg *sync.WaitGroup) {
