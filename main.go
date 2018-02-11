@@ -2,34 +2,45 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	"sync"
 )
 
 func main() {
 	maxProducers := 5
 	var maxConsumers = 5
 
+	var wg sync.WaitGroup
+
 	delivery := make(chan string)
 
 	for i := 1; i <= maxProducers; i++ {
-		go producer(i, delivery)
+		wg.Add(1)
+		go producer(i, delivery, &wg)
 	}
 
 	for i := 1; i <= maxConsumers; i++ {
-		go consumer(i, delivery)
+		wg.Add(1)
+		go consumer(i, delivery, &wg)
 	}
+
+	wg.Wait()
 }
 
-func producer(id int, delivery chan<- string) {
+func producer(id int, delivery chan<- string, wg *sync.WaitGroup) {
 	fmt.Printf("Producer created: %v\n", id)
 
-	delivery <- fmt.Sprintf("Product %d", rand.Intn(20))
+	p := fmt.Sprintf("Product %d\n", id)
+	fmt.Printf("Produced: %v", p)
+	delivery <- p
+
+	wg.Done()
 }
 
-func consumer(id int, delivery <-chan string) {
+func consumer(id int, delivery <-chan string, wg *sync.WaitGroup) {
 	fmt.Printf("Consumer created: %v\n", id)
 
 	p := <-delivery
+	fmt.Printf("Consumed: %v", p)
 
-	fmt.Printf("Product consumed: %s", p)
+	wg.Done()
 }
