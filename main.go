@@ -11,7 +11,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	delivery := make(chan string)
+	delivery := make(chan nutella)
 
 	for i := 1; i <= maxProducers; i++ {
 		wg.Add(1)
@@ -26,21 +26,27 @@ func main() {
 	wg.Wait()
 }
 
-func producer(id int, delivery chan<- string, wg *sync.WaitGroup) {
+func producer(id int, delivery chan<- nutella, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	fmt.Printf("Producer created: %v\n", id)
 
-	p := fmt.Sprintf("Product %d\n", id)
-	fmt.Printf("Produced: %v", p)
-	delivery <- p
+	var n nutella
+	n.weight = id
+	fmt.Printf("Produced: %+v\n", n)
+
+	delivery <- n
 }
 
-func consumer(id int, delivery <-chan string, wg *sync.WaitGroup) {
+func consumer(id int, delivery <-chan nutella, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	fmt.Printf("Consumer created: %v\n", id)
 
-	p := <-delivery
-	fmt.Printf("Consumed: %v", p)
+	n := <-delivery
+	fmt.Printf("Consumed: %+v\n", n)
+}
+
+type nutella struct {
+	weight int
 }
