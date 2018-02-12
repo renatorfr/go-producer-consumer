@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -35,7 +34,7 @@ func Run(maxProducers int, maxConsumers int) {
 func producer(id int, delivery chan<- food, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	fmt.Printf("Producer created: %v\n", id)
+	// fmt.Printf("Producer created: %v\n", id)
 
 	var f food
 
@@ -43,29 +42,29 @@ func producer(id int, delivery chan<- food, wg *sync.WaitGroup) {
 
 	if rand.Intn(2) == 1 {
 		f = nutella{weight: id}
-		fmt.Printf("Produced nutella: %+v\n", f)
+		// fmt.Printf("Produced nutella: %+v\n", f)
 	} else {
 		f = root{weight: id}
-		fmt.Printf("Produced root: %+v\n", f)
+		// fmt.Printf("Produced root: %+v\n", f)
 	}
 
 	select {
 	case delivery <- f:
 	case <-time.After(2 * time.Second):
-		fmt.Printf("Timeout producer: %v\n", id)
+		// fmt.Printf("Timeout producer: %v\n", id)
 	}
 }
 
 func consumer(id int, delivery <-chan food, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	fmt.Printf("Consumer created: %v\n", id)
+	// fmt.Printf("Consumer created: %v\n", id)
 
 	select {
 	case n := <-delivery:
 		n.eat()
 	case <-time.After(2 * time.Second):
-		fmt.Printf("Timeout consumer: %v\n", id)
+		// fmt.Printf("Timeout consumer: %v\n", id)
 	}
 }
 
@@ -74,7 +73,7 @@ type nutella struct {
 }
 
 func (n nutella) eat() {
-	fmt.Printf("Eating %v grams of nutella\n", n.weight)
+	// fmt.Printf("Eating %v grams of nutella\n", n.weight)
 }
 
 type food interface {
@@ -86,5 +85,5 @@ type root struct {
 }
 
 func (r root) eat() {
-	fmt.Printf("Eating %v grams of root\n", r.weight)
+	// fmt.Printf("Eating %v grams of root\n", r.weight)
 }
