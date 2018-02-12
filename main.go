@@ -9,7 +9,7 @@ import (
 
 func main() {
 	maxProducers := 5
-	var maxConsumers = 5
+	var maxConsumers = 6
 
 	var wg sync.WaitGroup
 
@@ -45,7 +45,11 @@ func producer(id int, delivery chan<- food, wg *sync.WaitGroup) {
 		fmt.Printf("Produced root: %+v\n", f)
 	}
 
-	delivery <- f
+	select {
+	case delivery <- f:
+	case <-time.After(2 * time.Second):
+		fmt.Printf("Timeout producer: %v\n", id)
+	}
 }
 
 func consumer(id int, delivery <-chan food, wg *sync.WaitGroup) {
@@ -53,8 +57,12 @@ func consumer(id int, delivery <-chan food, wg *sync.WaitGroup) {
 
 	fmt.Printf("Consumer created: %v\n", id)
 
-	n := <-delivery
-	n.eat()
+	select {
+	case n := <-delivery:
+		n.eat()
+	case <-time.After(2 * time.Second):
+		fmt.Printf("Timeout consumer: %v\n", id)
+	}
 }
 
 type nutella struct {
