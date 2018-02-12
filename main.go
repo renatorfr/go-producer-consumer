@@ -11,6 +11,10 @@ func main() {
 	maxProducers := 5
 	var maxConsumers = 6
 
+	Run(maxProducers, maxConsumers)
+}
+
+func Run(maxProducers int, maxConsumers int) {
 	var wg sync.WaitGroup
 
 	delivery := make(chan food)
