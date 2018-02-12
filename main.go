@@ -39,11 +39,11 @@ func producer(id int, delivery chan<- food, wg *sync.WaitGroup) {
 
 		delivery <- n
 	} else {
-		var r root
-		r.weight = id
-		fmt.Printf("Produced root: %+v\n", r)
+		var t tomato
+		t.weight = id
+		fmt.Printf("Produced tomato: %+v\n", t)
 
-		delivery <- r
+		delivery <- t
 	}
 
 }
@@ -69,10 +69,10 @@ type food interface {
 	eat()
 }
 
-type root struct {
+type tomato struct {
 	weight int
 }
 
-func (r root) eat() {
-	fmt.Printf("Eating %v grams of root\n", r.weight)
+func (r tomato) eat() {
+	fmt.Printf("Eating %v grams of tomato\n", r.weight)
 }
